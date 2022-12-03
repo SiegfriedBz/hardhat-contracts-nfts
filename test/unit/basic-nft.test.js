@@ -16,7 +16,7 @@ const { constants, expectRevert } = require("@openzeppelin/test-helpers")
 
       beforeEach(async function () {
         accounts = await ethers.getSigners()
-        ;[deployer, user01] = accounts
+        ;[deployer] = accounts
         await deployments.fixture(["all"])
         basicNft = await ethers.getContract("BasicNFT")
       })
