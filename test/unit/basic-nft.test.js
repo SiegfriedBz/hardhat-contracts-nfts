@@ -8,15 +8,11 @@ const { solidity } = require("ethereum-waffle")
 require("hardhat-gas-reporter")
 const { constants, expectRevert } = require("@openzeppelin/test-helpers")
 
-const TOKEN_URI =
-  "ipfs://bafybeig37ioir76s7mg5oobetncojcm3c3hxasyd4rvid4jqhy4gkaheg4/?filename=0-PUG.json"
-
 !developmentChains.includes(network.name)
   ? describe.skip
   : describe("Basic NFT", function () {
       let accounts, deployer
       let basicNft
-      // const chainId = network.config.chainId
 
       beforeEach(async function () {
         accounts = await ethers.getSigners()
