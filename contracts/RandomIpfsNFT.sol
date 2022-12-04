@@ -3,15 +3,18 @@ pragma solidity ^0.8.9;
 
 error RandomIpfsNFT__MustCoverMintFee();
 error RandomIpfsNFT__RangeOutOfBounds();
+error RandomIpfsNFT__AccessReservedToAdmin();
+error RandomIpfsNFT__AdminWithdrawETHFailed();
 
 // import "hardhat/console.sol";
-// ERC721
+// @openzeppelin
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 // Chainlink VRF v2
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 
-contract RandomIpfsNFT is ERC721URIStorage, VRFConsumerBaseV2 {
+contract RandomIpfsNFT is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
     /* Type Declaration */
     enum Breed {
         PUG,
@@ -99,7 +102,7 @@ contract RandomIpfsNFT is ERC721URIStorage, VRFConsumerBaseV2 {
         emit NFTMinted(nftOwner, newTokendId, breed);
     }
 
-    function getBreedIndex(uint256 _rdmNumber) internal view returns (uint8) {
+    function getBreedIndex(uint256 _rdmNumber) internal pure returns (uint8) {
         uint256[3] memory chanceArray = getChanceArray();
         uint256 limit = 0;
         for (uint8 i = 0; i < chanceArray.length; i++) {
@@ -111,8 +114,17 @@ contract RandomIpfsNFT is ERC721URIStorage, VRFConsumerBaseV2 {
         revert RandomIpfsNFT__RangeOutOfBounds();
     }
 
+    function withDrawEth() external payable onlyOwner {
+        (bool success, ) = payable(msg.sender).call{
+            value: address(this).balance
+        }("");
+        if (!success) {
+            revert RandomIpfsNFT__AdminWithdrawETHFailed();
+        }
+    }
+
     //* Getters */
-    function getChanceArray() public view returns (uint[3] memory) {
+    function getChanceArray() public pure returns (uint[3] memory) {
         return [10, 30, MAX_CHANCE_VALUE];
     }
 
