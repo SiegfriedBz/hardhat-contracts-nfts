@@ -114,7 +114,7 @@ contract RandomIpfsNFT is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
         revert RandomIpfsNFT__RangeOutOfBounds();
     }
 
-    function withDrawEth() external payable onlyOwner {
+    function withDrawEth() external onlyOwner {
         (bool success, ) = payable(msg.sender).call{
             value: address(this).balance
         }("");
@@ -124,16 +124,20 @@ contract RandomIpfsNFT is ERC721URIStorage, VRFConsumerBaseV2, Ownable {
     }
 
     //* Getters */
-    function getChanceArray() public pure returns (uint[3] memory) {
-        return [10, 30, MAX_CHANCE_VALUE];
-    }
-
     function getMintFee() public view returns (uint256) {
         return s_mintFee;
     }
 
-    function getNextTokenId() public view returns (uint256) {
+    function getTokenCounter() public view returns (uint256) {
         return s_tokenCounter;
+    }
+
+    function getTokenURI(uint256 _index) public view returns (string memory) {
+        return s_tokenURIs[_index];
+    }
+
+    function getChanceArray() public pure returns (uint[3] memory) {
+        return [10, 30, MAX_CHANCE_VALUE];
     }
 
     //* Fallbacks */
