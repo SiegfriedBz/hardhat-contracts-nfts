@@ -23,7 +23,6 @@ module.exports = async (hre) => {
     waitConfirmations: network.config.blockConfirmations || 1,
   })
   console.log("Deploying BasicNFT...DONE")
-  console.log(`Contract deployed to ${basicNft.address}`)
 
   if (
     !developmentChains.includes(network.name) &&
