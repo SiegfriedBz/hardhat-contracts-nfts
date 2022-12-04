@@ -14,8 +14,11 @@ module.exports = async (hre) => {
   const gasPriceLink = networkConfig[chainId].link_gasPriceLink // uint96 _gasPriceLink see hardhat-helper-config
 
   if (developmentChains.includes(network.name)) {
-    console.log("Local network detected! Deploying mocks...")
-    // deploy VRFCoordinatorV2 Mock
+    console.log("---------")
+    console.log("Local network detected!")
+    console.log("=> Deploying Mocks...")
+
+    // deploy VRFCoordinatorV2 Mock on local blockchain
     await deploy("VRFCoordinatorV2Mock", {
       contract: "VRFCoordinatorV2Mock",
       from: deployer,
@@ -23,8 +26,8 @@ module.exports = async (hre) => {
       log: true,
       waitConfirmations: 1,
     })
-    console.log("Mocks deployed.")
-    console.log("-------------------------")
+    console.log("Deploying Mocks...DONE")
+    console.log("---------")
   }
 }
 
