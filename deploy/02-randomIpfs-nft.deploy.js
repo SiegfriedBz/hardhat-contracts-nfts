@@ -1,4 +1,4 @@
-const { config, network } = require("hardhat")
+const { config, network, ethers } = require("hardhat")
 const {
   networkConfig,
   developmentChains,
@@ -11,15 +11,32 @@ module.exports = async (hre) => {
   const { deployer } = await getNamedAccounts()
   const chainId = network.config.chainId
 
-  console.log("chainId", chainId)
-
   //* Constructor args
   const mintFee = networkConfig[chainId].mintFee
   const tokenURIs = []
-  const vrfCoordinatorV2 = networkConfig[chainId].vrfCoordinatorV2
   const gasLane = networkConfig[chainId].gasLane
-  const subscriptionId = networkConfig[chainId].subscriptionId
   const callbackGasLimit = networkConfig[chainId].callbackGasLimit
+  let vrfCoordinatorV2
+  let subscriptionId
+
+  if (developmentChains.includes(network.name)) {
+    const VRFCoordinatorV2Mock = await ethers.getContract(
+      "VRFCoordinatorV2Mock"
+    )
+    vrfCoordinatorV2 = VRFCoordinatorV2Mock.address
+    const transactionResponse = await VRFCoordinatorV2Mock.createSubscription()
+    const transactionReceipt = await transactionResponse.wait(1)
+    // get subscriptionId from event RandomWordsRequested emitted by VRFCoordinatorV2Mock
+    subscriptionId = transactionReceipt.events[0].args.subId
+    // fund the subscription (done with LINK on real networks)
+    await VRFCoordinatorV2Mock.fundSubscription(
+      subscriptionId,
+      ethers.utils.parseEther("2")
+    )
+  } else {
+    vrfCoordinatorV2 = networkConfig[chainId].vrfCoordinatorV2
+    subscriptionId = networkConfig[chainId].subscriptionId
+  }
 
   const args = [
     mintFee,
